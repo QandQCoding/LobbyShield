@@ -20,25 +20,22 @@ public class ShieldListener implements Listener {
 
 
     public static ArrayList<Player> schutzschild = new ArrayList<>();
-    public String team;
 
-    public Player p;
+    public Player player;
 
-    int counter;
 
-    int time;
 
     BukkitRunnable task;
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        Player p = event.getPlayer();
+        Player player = event.getPlayer();
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
             if (event.getItem() == null) return;
             if (event.getItem().getItemMeta() == null) return;
             if (event.getItem().getItemMeta().getDisplayName() == null) return;
             if (event.getItem().getItemMeta().getDisplayName().equals("§6Schild")) {
-                SchildInventory(p);
+                SchildInventory(player);
             }
         }
     }
@@ -52,7 +49,7 @@ public class ShieldListener implements Listener {
                 if (player.hasPermission("lobby.shield")) {
                     if (schutzschild.contains(player)) {
                         schutzschild.remove(player);
-                        SchutzSchildManager(p);
+                        SchutzSchildManager(player);
                         player.sendMessage(LobbyShield.getInstance().getConstants().getPrefix() + "§7Das Schild wurde §cdeaktiviert");
                         player.closeInventory();
                     }

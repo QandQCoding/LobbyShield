@@ -1,6 +1,5 @@
 package eu.qandqcoding.spigot.lobbyshield.utils;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -8,8 +7,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class Config {
@@ -37,15 +34,6 @@ public class Config {
         return this;
     }
 
-    public int getInt(String name) {
-        load();
-        return c.getInt(name);
-    }
-
-    public Double getDouble(String name) {
-        load();
-        return c.getDouble(name);
-    }
 
     @SuppressWarnings("unchecked")
     public ArrayList<UUID> getUUIDMap(String name) {
@@ -73,30 +61,6 @@ public class Config {
     public String getString(String name) {
         load();
         return c.getString(name);
-    }
-
-    public boolean getBoolean(String name) {
-        return c.getBoolean(name);
-    }
-
-    public long getLong(String name) {
-        return c.getLong(name);
-    }
-
-    public List<String> getStringList(String name) {
-        return c.getStringList(name);
-    }
-
-    public Set<String> getKeys(boolean deep) {
-        return c.getKeys(deep);
-    }
-
-    public ConfigurationSection getConfigurationSection(String Section) {
-        return c.getConfigurationSection(Section);
-    }
-
-    public boolean exist() {
-        return this.f.exists();
     }
 
     public Config load() {
