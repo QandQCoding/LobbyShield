@@ -1,0 +1,9 @@
+name: HypeLobby
+author: quele
+version: 1.0
+main: eu.qandqcoding.spigot.lobbyshield.LobbyShield
+api-version: 1.16
+
+commands:
+  shield:
+    description: Shield Command

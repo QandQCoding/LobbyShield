@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
+
 import java.util.ArrayList;
 
 public class ShieldListener implements Listener {
@@ -47,7 +48,7 @@ public class ShieldListener implements Listener {
             if (event.getCurrentItem() == null) return;
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals("§c§lDEAKTIVIEREN")) {
                 if (player.hasPermission("lobby.shield")) {
-                    if (schutzschild.contains(player)) {
+                    if (schutzschild().contains(player)) {
                         schutzschild.remove(player);
                         SchutzSchildManager(player);
                         player.sendMessage(LobbyShield.getInstance().getConstants().getPrefix() + "§7Das Schild wurde §cdeaktiviert");
