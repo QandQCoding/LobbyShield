@@ -1,22 +1,41 @@
-You need a YouTube shield so that they are not flooded by other players? Then use my shield system
+# Project Title
+
+A brief description of what this project does and who it's for
 
 
-[+] good performance
-[+] simple code
-[+] Easy to revise
-[+] Drag and drop ready
+## Badges
 
-[SPOILER="Config.yml"]Prefix: '&6QandQProject &8| &7'
-[/SPOILER]
-[SPOILER="Screenshots"][ATTACH=full]704785[/ATTACH]
-[ATTACH=full]704786[/ATTACH]
-[ATTACH=full]704787[/ATTACH]
-[/SPOILER]
-[SPOILER="Video"]
-[MEDIA=youtube]T1GtDDyZT3w[/MEDIA]
-[/SPOILER]
+Add badges from somewhere like: [shields.io](https://shields.io/)
 
-[QUOTE]IIf you enjoy this completely open-source & awesome plugin, you can show your support by leaving a like, and review.[/QUOTE]
 
-Keywords: Lobby, LobbySchild, Lobby Shield, Lobby Schild, Lobby
+## Support
 
+For support, our discord server https://qandqcoding.de/go/discord .
+
+
+## Authors
+
+
+- [@QuadrixYT](https://github.com/QuadrixYT)
+
+- [@quele](https://github.com/quele-official)
+
+
+## Features
+
+- good performance
+- simple code
+- Easy to revise
+- Drag and drop ready
+- Fast support
+
+
+
+## Screenshots
+
+![App Screenshot](https://www.spigotmc.org/attachments/upload_2022-6-1_16-45-20-png.704785/)
+
+![App Screenshot](https://www.spigotmc.org/attachments/upload_2022-6-1_16-45-48-png.704786/)
+
+## Video:
+[![Everything Is AWESOME](https://www.spigotmc.org/attachments/upload_2022-6-1_16-46-54-png.704787/)](https://youtu.be/T1GtDDyZT3w "QandQ Lobby Shield")
