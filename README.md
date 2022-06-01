@@ -1,11 +1,4 @@
-# Project Title
-
-A brief description of what this project does and who it's for
-
-
-## Badges
-
-Add badges from somewhere like: [shields.io](https://shields.io/)
+# QandQ - Coding | Lobby Shield
 
 
 ## Support
