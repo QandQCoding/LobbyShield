@@ -3,7 +3,7 @@
 
 ## Support
 
-For support, our discord server https://qandqcoding.de/go/discord .
+For support, our discord server https://discord.gg/aKHn5KtRbE .
 
 
 ## Authors
