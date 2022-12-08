@@ -14,7 +14,7 @@ For support, our discord server https://discord.gg/aKHn5KtRbE .
 - [@quele](https://github.com/quele-official)
 
 ## Download
-- SpigotMC[https://www.spigotmc.org/resources/lobby-shield.102316/]
+- [SpigotMC](https://www.spigotmc.org/resources/lobby-shield.102316/)
 
 ## Features
 
