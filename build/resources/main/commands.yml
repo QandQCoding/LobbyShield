@@ -4,7 +4,7 @@
 commands:
   # Config for /shield
   shield_module:
-    prefix: '&8[&6Shield&8] &7'
+    prefix: '&8[&Shield&8] &7'
     command: shield
     command_permission: 'shield.use'
     min_length: 5
