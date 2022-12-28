@@ -1,6 +1,8 @@
 package eu.qandqcoding.spigot.lobbyshield.listener;
 
 import eu.qandqcoding.spigot.lobbyshield.LobbyShield;
+import eu.qandqcoding.spigot.lobbyshield.config.Config;
+import eu.qandqcoding.spigot.lobbyshield.utils.CommandUtils;
 import eu.qandqcoding.spigot.lobbyshield.utils.ItemAPI;
 import eu.qandqcoding.spigot.lobbyshield.utils.ItemBuilder;
 import org.bukkit.*;
@@ -10,10 +12,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
-
 
 import java.util.ArrayList;
 
@@ -23,11 +26,15 @@ public class ShieldListener implements Listener {
     public static ArrayList<Player> schutzschild = new ArrayList<>();
 
     public Player player;
-
-
-
     BukkitRunnable task;
+    private Config messagesConfig;
+    private Config config;
 
+
+    public ShieldListener() {
+        this.messagesConfig = LobbyShield.getInstance().getConfigManager().getMessagesConfig();
+        this.config = LobbyShield.getInstance().getConfigManager().getConfig();
+    }
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -35,8 +42,9 @@ public class ShieldListener implements Listener {
             if (event.getItem() == null) return;
             if (event.getItem().getItemMeta() == null) return;
             if (event.getItem().getItemMeta().getDisplayName() == null) return;
-            if (event.getItem().getItemMeta().getDisplayName().equals("§6Schild")) {
+            if (event.getItem().getItemMeta().getDisplayName().equals(this.config.getString("item.name"))) {
                 SchildInventory(player);
+                event.setCancelled(true);
             }
         }
     }
@@ -44,59 +52,72 @@ public class ShieldListener implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         final Player player = (Player) event.getWhoClicked();
-        if (player.getOpenInventory().getTitle().equals("§8» §6Schild")) {
+        if (player.getOpenInventory().getTitle().equals(this.config.getString("item.inventory_name"))) {
             if (event.getCurrentItem() == null) return;
-            if (event.getCurrentItem().getItemMeta().getDisplayName().equals("§c§lDEAKTIVIEREN")) {
-                if (player.hasPermission("lobby.shield")) {
+            if (event.getCurrentItem().getItemMeta().getDisplayName().equals(this.config.getString("item.inventory_deactivate_item_name"))) {
+                if (CommandUtils.hasPermission(player, "messages.commands.shield.permission")) {
                     if (schutzschild().contains(player)) {
                         schutzschild.remove(player);
                         SchutzSchildManager(player);
-                        player.sendMessage(LobbyShield.getInstance().getConstants().getPrefix() + "§7Das Schild wurde §cdeaktiviert");
+                        player.sendMessage(this.messagesConfig.getMessage("messages.commands.shield.deactivated", player));
                         player.closeInventory();
                     }
                 }
                 player.closeInventory();
-            } else if (event.getCurrentItem().getItemMeta().getDisplayName().equals("§a§lAKTIVIEREN")) {
-                if (player.hasPermission("lobby.shield"))
+            } else if (event.getCurrentItem().getItemMeta().getDisplayName().equals(this.config.getString("item.inventory_activate_item_name"))) {
+                if (CommandUtils.hasPermission(player, "messages.commands.shield.permission")) {
                     if (!schutzschild.contains(player)) {
                         schutzschild.add(player);
                         SchutzSchildManager(player);
-                        player.sendMessage(LobbyShield.getInstance().getConstants().getPrefix() + "§7Das Schild wurde §aaktiviert");
+                        player.sendMessage(this.messagesConfig.getMessage("messages.commands.shield.activated", player));
                         player.closeInventory();
                     }
+                }
             }
             event.setCancelled(true);
             if (event.getCurrentItem().getType() == Material.BLACK_STAINED_GLASS_PANE) {
                 player.playSound(player.getLocation(), Sound.ENTITY_SPLASH_POTION_BREAK, 1f, 1f);
-                player.sendMessage(LobbyShield.getInstance().getConstants().getPrefix() + "§cAktion abgebrochen");
                 player.closeInventory();
             }
         }
     }
 
     @EventHandler
-    public void onQuit(PlayerQuitEvent e) {
-        Player p = e.getPlayer();
-        schutzschild.remove(p);
+    public void onJoin(PlayerJoinEvent e) {
+        Player player = e.getPlayer();
+        if (CommandUtils.hasPermission(player, "messages.commands.shield.permission")) {
+            if( this.config.getBoolean("item.on_join.enabled")) {
+                player.getInventory().setItem(this.config.getInt("item.on_join.slot"), new ItemAPI(this.config.getString("item.name"), Material.getMaterial(this.config.getString("item.material")), 1, this.config.getStringList("item.lore")).build());
+            }
+            if (this.config.getBoolean("item.on_join.auto_activate")) {
+                if (!schutzschild.contains(player)) {
+                    schutzschild.add(player);
+                    SchutzSchildManager(player);
+                }
+            }
+        }
     }
 
+    @EventHandler
+    public void onQuit(PlayerQuitEvent e) {
+        Player player = e.getPlayer();
+        schutzschild.remove(player);
+    }
+
+
     public void SchildInventory(Player player) {
-        Inventory inventory = Bukkit.createInventory(null, 9 * 3, "§8» §6Schild");
+        Inventory inventory = Bukkit.createInventory(null, 9 * 3, this.config.getString("item.inventory_name"));
         for (int i = 0; i < inventory.getSize(); i++) {
             inventory.setItem(i, new ItemAPI("§7", Material.BLACK_STAINED_GLASS_PANE, 1).addHideFlag().build());
         }
         if (schutzschild.contains(player)) {
-            inventory.setItem(13, new ItemBuilder(Material.PLAYER_HEAD)
-                    .setName("§c§lDEAKTIVIEREN")
-                    .setSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWZkZTNiZmNlMmQ4Y2I3MjRkZTg1NTZlNWVjMjFiN2YxNWY1ODQ2ODRhYjc4NTIxNGFkZDE2NGJlNzYyNGIifX19")
-                    .toItemStack());
+            inventory.setItem(13, new ItemBuilder(Material.PLAYER_HEAD).setName(this.config.getString("item.inventory_deactivate_item_name")).setSkull(this.config.getString("item.inventory_deactivate_item_skull")).toItemStack());
 
         } else {
-            inventory.setItem(13, new ItemBuilder(Material.PLAYER_HEAD)
-                    .setName("§a§lAKTIVIEREN\n")
-                    .setSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTllNGJkY2YxNzJkNWRjNzdjMmJkNGUzN2FkOTg1Mzk5YTlmMmNkZWJmNzI0NjM5MjllYTRiNjY2ZWY2ZjgwIn19fQ==")
-                    .toItemStack());
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 3.0F, 1.0F);
+            inventory.setItem(13, new ItemBuilder(Material.PLAYER_HEAD).setName(this.config.getString("item.inventory_activate_item_name")).setSkull(this.config.getString("item.inventory_activate_item_skull")).toItemStack());
+            if (this.config.getBoolean("item.sound.enabled")) {
+                player.playSound(player.getLocation(), Sound.valueOf(this.config.getString("item.sound.sound")), this.config.getInt("item.sound.volume"), this.config.getInt("item.sound.pitch"));
+            }
         }
         player.openInventory(inventory);
     }

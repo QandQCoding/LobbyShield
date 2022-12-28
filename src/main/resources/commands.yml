@@ -1,0 +1,16 @@
+# Shield 4.1.3 by QandQCoding Development Team
+# Support: https://www.qandqcoding.de
+
+commands:
+  # Config for /shield
+  shield_module:
+    prefix: '&8[&Shield&8] &7'
+    command: shield
+    command_permission: 'shield.use'
+    min_length: 5
+    uuid: true
+    description: 'Get the shield'
+    usage: '/shield'
+    success: '&aYou have successfully get the shield!'
+    aliases:
+      - shield

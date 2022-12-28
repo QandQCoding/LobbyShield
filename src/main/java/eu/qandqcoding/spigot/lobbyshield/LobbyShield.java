@@ -1,54 +1,59 @@
 package eu.qandqcoding.spigot.lobbyshield;
 
-import eu.qandqcoding.spigot.lobbyshield.commands.ShieldCommand;
 import eu.qandqcoding.spigot.lobbyshield.listener.ShieldListener;
-import eu.qandqcoding.spigot.lobbyshield.utils.Config;
-import eu.qandqcoding.spigot.lobbyshield.utils.Constants;
+import eu.qandqcoding.spigot.lobbyshield.manager.CommandManager;
+import eu.qandqcoding.spigot.lobbyshield.manager.ConfigManager;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LobbyShield extends JavaPlugin {
     private static LobbyShield instance;
-    private Config config;
-    private Constants constants;
+
+    private ConfigManager configManager;
 
     public static LobbyShield getInstance() {
         return instance;
     }
 
+    public static LobbyShield getPlugin() {
+        return instance;
+    }
+
+    @Override
+    public void onLoad() {
+        JavaPlugin.getPlugin( LobbyShield.class ); // Is here to prevent possible bugs for 1.8.8 servers
+        instance = this;
+    }
+
     @Override
     public void onEnable() {
+        this.configManager = new ConfigManager();
+        this.configManager.setPrefix();
         instance = this;
-        config = new Config(getDataFolder().getAbsolutePath(), "config.yml");
-        constants = new Constants(this);
-        getLogger().info(constants.getPrefix() + "Das System wurde aktiviert§8.");
+        getLogger().info("Lobbyshield activated§8.");
+        CommandManager commandManager = new CommandManager();
         registerListener();
-        registerCommands();
+
     }
 
     @Override
     public void onDisable() {
-        getLogger().info(constants.getPrefix() + "Das System wurde deaktiviert§8.");
+        getLogger().info("Lobbyshield disabled§8.");
 
-    }
-
-    public Config getConfigFile() {
-        return config;
-    }
-
-    public Constants getConstants() {
-        return constants;
     }
 
     private void registerListener() {
+        Listener[] listeners = new Listener[]{
+                new ShieldListener()};
 
-        PluginManager pluginManager = Bukkit.getPluginManager();
-        pluginManager.registerEvents(new ShieldListener(), this);
+        for (Listener listener : listeners)
+            Bukkit.getPluginManager().registerEvents(listener, this);
     }
 
-    private void registerCommands() {
-        getCommand("shield").setExecutor(new ShieldCommand());
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
+
 
 }

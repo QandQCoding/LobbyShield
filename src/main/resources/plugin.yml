@@ -1,9 +1,8 @@
-name: HypeLobby
-author: quele
+name: Shield
+author: QandQ Development
 version: 1.0
 main: eu.qandqcoding.spigot.lobbyshield.LobbyShield
 api-version: 1.16
+description: A hot LobbyShield
+website: https://www.qandqcoding.de
 
-commands:
-  shield:
-    description: Shield Command
