@@ -1,0 +1,24 @@
+specVersion: 1
+type: plugin
+name: Lobby Shield
+authors:
+  - QuadrixYT
+  - quele
+supportedGameVersions: ^1.19
+category: misc
+introduction: You are looking for a shield plugin so that the VIPs can play undisturbed?
+description: |
+  ## Features
+  
+  - good performance
+  - simple code
+  - Easy to revise
+  - Drag and drop ready
+  - Fast support
+  
+  # Commands:
+  - /shield
+ 
+icon: https://www.spigotmc.org/data/resource_icons/102/102316.jpg?1654079590
+videoSources:
+  - https://www.youtube.com/watch?v=T1GtDDyZT3w
