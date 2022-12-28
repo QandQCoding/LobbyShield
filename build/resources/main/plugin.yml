@@ -1,8 +1,0 @@
-name: Shield
-author: QandQ Development
-version: 2.0
-main: eu.qandqcoding.spigot.lobbyshield.LobbyShield
-api-version: 1.16
-description: A hot LobbyShield
-website: https://www.qandqcoding.de
-
