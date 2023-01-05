@@ -18,11 +18,12 @@ For support, our discord server https://discord.gg/aKHn5KtRbE .
 
 ## Features
 
-- good performance
-- simple code
+- does not affect performance
+- simple and clean code
 - Easy to revise
 - Drag and drop ready
 - Fast support
+- You have a certain radius to yourself in which the shield can not enter the area where the player is currently standing
 
 
 
