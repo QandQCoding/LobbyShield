@@ -18,3 +18,7 @@ item:
     enabled: true
     auto_activate: true
     slot: 0
+  shield:
+    knockback-rate: 2
+    hight: 1
+    distance: 5
