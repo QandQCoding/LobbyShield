@@ -20,21 +20,21 @@ public class Config {
     private final String fileName;
 
     public Config( String fileName ) {
-        this.file = new File( LobbyShield.getPlugin().getDataFolder(), fileName );
+        this.file = new File( LobbyShield.getInstance().getDataFolder(), fileName );
         this.fileName = fileName;
         this.initialize( fileName );
         this.config = YamlConfiguration.loadConfiguration( file );
     }
 
     private void initialize( String fileName ) {
-        if ( !LobbyShield.getPlugin().getDataFolder().exists() ) LobbyShield.getPlugin().getDataFolder().mkdir();
-        if ( !this.file.exists() ) LobbyShield.getPlugin().saveResource( fileName, false );
+        if ( !LobbyShield.getInstance().getDataFolder().exists() ) LobbyShield.getInstance().getDataFolder().mkdir();
+        if ( !this.file.exists() ) LobbyShield.getInstance().saveResource( fileName, false );
     }
 
     public String getMessage( String path, CommandSender sender ) {
         String value = this.getString( path );
         value = value.replace( " %line% ", "\n" );
-        value = value.replace( "%prefix%", LobbyShield.getPlugin().getConfigManager().getPrefix() );
+        value = value.replace( "%prefix%", LobbyShield.getInstance().getConfigManager().getPrefix() );
         return value;
     }
 
@@ -46,11 +46,7 @@ public class Config {
         return this.config.getInt( path );
     }
 
-    public ConfigurationSection getSection(String path ) {
-        return this.config.getConfigurationSection( path );
-    }
-
-    public String getString( String path ) {
+    public String getString(String path) {
         String value = this.config.getString( path );
         if ( value == null )
             return "§5LobbyShield §8| §cConfig entry §e" + path + " §cin §e" + this.fileName
@@ -58,31 +54,9 @@ public class Config {
         return ChatColor.translateAlternateColorCodes( '&', value );
     }
 
-    public FileConfiguration getConfig() {
-        return this.config;
-    }
-
     public List<String> getStringList(String path ) {
         return this.config.getStringList( path );
     }
 
-    public void set( String path, Object value ) {
-        this.config.set( path, value );
-    }
 
-    public void saveConfig() {
-        try {
-            this.config.save( this.file );
-        } catch ( IOException e ) {
-            e.printStackTrace();
-        }
-    }
-
-    public void reloadConfig() {
-        this.config = YamlConfiguration.loadConfiguration( this.file );
-    }
-
-    public int getMessage(int parseInt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 }

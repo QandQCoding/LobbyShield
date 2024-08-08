@@ -4,7 +4,7 @@ name: Lobby Shield
 authors:
   - QuadrixYT
   - quele-official
-supportedGameVersions: ^1.19
+supportedGameVersions: ^1.21
 category: misc
 introduction: You are looking for a shield plugin so that the VIPs can play undisturbed?
 description: |

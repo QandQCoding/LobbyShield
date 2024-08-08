@@ -8,7 +8,7 @@ For support, our discord server https://discord.gg/aKHn5KtRbE .
 
 ## Authors
 
-
+ 
 - [@QuadrixYT](https://github.com/QuadrixYT)
 
 - [@quele](https://github.com/quele-official)
@@ -27,11 +27,5 @@ For support, our discord server https://discord.gg/aKHn5KtRbE .
 
 
 
-## Screenshots
-
-![App Screenshot](https://www.spigotmc.org/attachments/upload_2022-6-1_16-45-20-png.704785/)
-
-![App Screenshot](https://www.spigotmc.org/attachments/upload_2022-6-1_16-45-48-png.704786/)
-
 ## Video:
-[![Everything Is AWESOME](https://www.spigotmc.org/attachments/upload_2022-6-1_16-46-54-png.704787/)](https://youtu.be/T1GtDDyZT3w "QandQ Lobby Shield")
+[<img src="https://cdn.discordapp.com/attachments/1008739429105537085/1271097102461833351/upload_2022-6-1_16-46-54.png?ex=66b618ed&is=66b4c76d&hm=8d3b3c40c75419b9f062794604e432939e992eecf71117b19d42fa199971b7fc&" width="50%">](https://www.youtube.com/watch?v=T1GtDDyZT3w "LobbyShield Example Video")

@@ -16,195 +16,182 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ShieldListener implements Listener {
 
-
-    public static ArrayList<Player> schutzschild = new ArrayList<>();
-
-    public Player player;
-    private Config messagesConfig;
-    private Config config;
-
+    private final Set<Player> schutzschild = new HashSet<>();
+    private final Config messagesConfig;
+    private final Config config;
 
     public ShieldListener() {
-        this.messagesConfig = LobbyShield.getInstance().getConfigManager().getMessagesConfig();
-        this.config = LobbyShield.getInstance().getConfigManager().getConfig();
+        LobbyShield instance = LobbyShield.getInstance();
+        this.messagesConfig = instance.getConfigManager().getMessagesConfig();
+        this.config = instance.getConfigManager().getConfig();
     }
+
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
-            if (event.getItem() == null) return;
-            if (event.getItem().getItemMeta() == null) return;
-            if (event.getItem().getItemMeta().getDisplayName() == null) return;
-            if (event.getItem().getItemMeta().getDisplayName().equals(this.config.getString("item.name"))) {
-                SchildInventory(player);
+            if (isValidShieldItem(event.getItem())) {
+                openShieldInventory(player);
                 event.setCancelled(true);
             }
         }
     }
 
+    private boolean isValidShieldItem(ItemStack item) {
+        return item != null &&
+                item.hasItemMeta() &&
+                item.getItemMeta().hasDisplayName() &&
+                item.getItemMeta().displayName().equals(config.getString("item.name"));
+    }
+
+
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        SchutzSchildManager manager = new SchutzSchildManager(player, JavaPlugin.getPlugin(LobbyShield.class));
-        if (player.getOpenInventory().getTitle().equals(this.config.getString("item.inventory_name"))) {
-            if (event.getCurrentItem() == null) return;
-            if (event.getCurrentItem().getItemMeta().getDisplayName().equals(this.config.getString("item.inventory_deactivate_item_name"))) {
-                if (CommandUtils.hasPermission(player, "messages.commands.shield.permission")) {
-                    if (schutzschild().contains(player)) {
-                        schutzschild.remove(player);
-                        manager.stop();
-                        player.sendMessage(this.messagesConfig.getMessage("messages.commands.shield.deactivated", player));
-                        player.closeInventory();
-                    }
-                }
-                player.closeInventory();
-            } else if (event.getCurrentItem().getItemMeta().getDisplayName().equals(this.config.getString("item.inventory_activate_item_name"))) {
-                if (CommandUtils.hasPermission(player, "messages.commands.shield.permission")) {
-                    if (!schutzschild.contains(player)) {
-                        schutzschild.add(player);
-                        manager.start();
-                        player.sendMessage(this.messagesConfig.getMessage("messages.commands.shield.activated", player));
-                        player.closeInventory();
-                    }
-                }
-            }
-            event.setCancelled(true);
-            if (event.getCurrentItem().getType() == Material.BLACK_STAINED_GLASS_PANE) {
+        SchutzSchildManager manager = new SchutzSchildManager(player);
+
+        String inventoryTitle = player.getOpenInventory().getTitle();
+
+        if (inventoryTitle.equals(config.getString("item.inventory_name"))) {
+            if (event.getCurrentItem() == null || !event.getCurrentItem().hasItemMeta()) return;
+
+            String itemName = event.getCurrentItem().getItemMeta().displayName().toString();
+
+            if (itemName.equals(config.getString("item.inventory_deactivate_item_name"))) {
+                deactivateShield(player, manager);
+            } else if (itemName.equals(config.getString("item.inventory_activate_item_name"))) {
+                activateShield(player, manager);
+            } else if (event.getCurrentItem().getType() == Material.BLACK_STAINED_GLASS_PANE) {
                 player.playSound(player.getLocation(), Sound.ENTITY_SPLASH_POTION_BREAK, 1f, 1f);
                 player.closeInventory();
             }
+            event.setCancelled(true);
+        }
+    }
+
+    private void deactivateShield(Player player, SchutzSchildManager manager) {
+        if (CommandUtils.hasPermission(player, "messages.commands.shield.permission") && schutzschild.contains(player)) {
+            schutzschild.remove(player);
+            manager.stop();
+            player.sendMessage(messagesConfig.getMessage("messages.commands.shield.deactivated", player));
+            player.closeInventory();
+        }
+    }
+
+    private void activateShield(Player player, SchutzSchildManager manager) {
+        if (CommandUtils.hasPermission(player, "messages.commands.shield.permission") && !schutzschild.contains(player)) {
+            schutzschild.add(player);
+            manager.start();
+            player.sendMessage(messagesConfig.getMessage("messages.commands.shield.activated", player));
+            player.closeInventory();
         }
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        SchutzSchildManager manager = new SchutzSchildManager(player, JavaPlugin.getPlugin(LobbyShield.class));
+        SchutzSchildManager manager = new SchutzSchildManager(player);
+
         if (CommandUtils.hasPermission(player, "messages.commands.shield.permission")) {
-            if( this.config.getBoolean("item.on_join.enabled")) {
-                player.getInventory().setItem(this.config.getInt("item.on_join.slot"), new ItemAPI(this.config.getString("item.name"), Material.getMaterial(this.config.getString("item.material")), 1, this.config.getStringList("item.lore")).build());
+            if (config.getBoolean("item.on_join.enabled")) {
+                player.getInventory().setItem(
+                        config.getInt("item.on_join.slot"),
+                        new ItemAPI(
+                                config.getString("item.name"),
+                                Material.getMaterial(config.getString("item.material")),
+                                1,
+                                config.getStringList("item.lore")
+                        ).build()
+                );
             }
-            if (this.config.getBoolean("item.on_join.auto_activate")) {
-                if (!schutzschild.contains(player)) {
-                    schutzschild.add(player);
-                    manager.start();
-                }
+
+            if (config.getBoolean("item.on_join.auto_activate") && !schutzschild.contains(player)) {
+                schutzschild.add(player);
+                manager.start();
             }
         }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-        SchutzSchildManager manager = new SchutzSchildManager(player, JavaPlugin.getPlugin(LobbyShield.class));
         Player player = e.getPlayer();
         schutzschild.remove(player);
-        manager.stop();
+        new SchutzSchildManager(player).stop();
     }
 
+    private void openShieldInventory(Player player) {
+        Inventory inventory = Bukkit.createInventory(null, 9 * 3, config.getString("item.inventory_name"));
 
-    public void SchildInventory(Player player) {
-        Inventory inventory = Bukkit.createInventory(null, 9 * 3, this.config.getString("item.inventory_name"));
         for (int i = 0; i < inventory.getSize(); i++) {
             inventory.setItem(i, new ItemAPI("§7", Material.BLACK_STAINED_GLASS_PANE, 1).addHideFlag().build());
         }
-        if (schutzschild.contains(player)) {
-            inventory.setItem(13, new ItemBuilder(Material.PLAYER_HEAD).setName(this.config.getString("item.inventory_deactivate_item_name")).setSkull(this.config.getString("item.inventory_deactivate_item_skull")).toItemStack());
 
+        if (schutzschild.contains(player)) {
+            inventory.setItem(13, new ItemBuilder(Material.PLAYER_HEAD)
+                    .setName(config.getString("item.inventory_deactivate_item_name"))
+                    .setSkull(config.getString("item.inventory_deactivate_item_skull"))
+                    .toItemStack());
         } else {
-            inventory.setItem(13, new ItemBuilder(Material.PLAYER_HEAD).setName(this.config.getString("item.inventory_activate_item_name")).setSkull(this.config.getString("item.inventory_activate_item_skull")).toItemStack());
-            if (this.config.getBoolean("item.sound.enabled")) {
-                player.playSound(player.getLocation(), Sound.valueOf(this.config.getString("item.sound.sound")), this.config.getInt("item.sound.volume"), this.config.getInt("item.sound.pitch"));
+            inventory.setItem(13, new ItemBuilder(Material.PLAYER_HEAD)
+                    .setName(config.getString("item.inventory_activate_item_name"))
+                    .setSkull(config.getString("item.inventory_activate_item_skull"))
+                    .toItemStack());
+
+            if (config.getBoolean("item.sound.enabled")) {
+                player.playSound(player.getLocation(), Sound.valueOf(config.getString("item.sound.sound")), config.getInt("item.sound.volume"), config.getInt("item.sound.pitch"));
             }
         }
         player.openInventory(inventory);
     }
 
-    public ArrayList<Player> schutzschild() {
-        return schutzschild;
-    }
-
     public class SchutzSchildManager {
-        private int taskId;
         private final Player player;
-        private final LobbyShield plugin;
-        private int multiply;
-        private int hight;
-        private int near;
-        private Config config;
+        private final LobbyShield plugin = JavaPlugin.getPlugin(LobbyShield.class);
+        private final int multiply;
+        private final int height;
+        private final int near;
 
-
-        public SchutzSchildManager(Player player, LobbyShield plugin) {
-
-            this.config = LobbyShield.getInstance().getConfigManager().getConfig();
+        public SchutzSchildManager(Player player) {
             this.player = player;
-            this.plugin = plugin;
-            this.multiply = this.config.getInt("shield.knockback-rate");
-            this.hight = this.config.getInt("shield.hight");
-            this.near = plugin.getConfig().getInt("shield.distance");
+            this.multiply = config.getInt("shield.knockback-rate");
+            this.height = config.getInt("shield.height");
+            this.near = config.getInt("shield.distance");
         }
 
         public void start() {
-            Player player = this.player;
-            if (!player.isOnline()) {
-                return;
-            }
+            if (!player.isOnline()) return;
 
-            taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (ShieldListener.schutzschild.contains(player)) {
-                        player.playEffect(player.getLocation(), Effect.ENDER_SIGNAL, 1);
-
-                        for (Entity entity : player.getNearbyEntities(near, near, near)) {
-                            if (entity instanceof Player && entity != player && ShieldListener.schutzschild.contains(player)) {
-                                Player players = (Player) entity;
-                                if (player.getLocation().distanceSquared(players.getLocation()) <= near * near) {
-                                    for (int i = 0; i < 10; i++) {
-                                        players.setVelocity(players.getLocation().getDirection().multiply(-multiply).setY(hight));
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        stop();
+                    if (!schutzschild.contains(player)) {
+                        cancel();
+                        return;
                     }
+
+                    player.playEffect(player.getLocation(), Effect.ENDER_SIGNAL, 1);
+
+                    player.getNearbyEntities(near, near, near).stream()
+                            .filter(entity -> entity instanceof Player && entity != player && schutzschild.contains(player))
+                            .map(entity -> (Player) entity)
+                            .filter(p -> player.getLocation().distanceSquared(p.getLocation()) <= near * near)
+                            .forEach(p -> p.setVelocity(p.getLocation().getDirection().multiply(-multiply).setY(height)));
                 }
-            }, 0L, 5L);
+            }.runTaskTimer(plugin, 0L, 5L);
         }
 
         public void stop() {
-            Bukkit.getScheduler().cancelTask(taskId);
+            // BukkitRunnable automatically cancels itself, no need to track task IDs.
         }
     }
-
-    public class EffectPlayer {
-        private boolean stop;
-
-        public void playEffect(Location loc, boolean vis) {
-            int i = 0;
-            while (!stop) {
-                for (i = 0; i <= 8; i += (!vis && i == 3) ? 2 : 1)
-                    loc.getWorld().playEffect(loc, Effect.ENDER_SIGNAL, i);
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                }
-            }
-        }
-
-        public void stop() {
-            stop = true;
-        }
-    }
-
-
-
-
 }

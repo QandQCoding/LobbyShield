@@ -5,37 +5,57 @@ import eu.qandqcoding.spigot.lobbyshield.commands.ShieldCommand;
 import eu.qandqcoding.spigot.lobbyshield.config.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandMap;
+
+import java.lang.reflect.Field;
 
 public class CommandManager {
 
     private final ShieldCommand shieldCommand;
 
-
     public CommandManager() {
-        Config config = LobbyShield.getPlugin().getConfigManager().getCommandsConfig();
+        Config config = LobbyShield.getInstance().getConfigManager().getCommandsConfig();
 
-        this.shieldCommand = new ShieldCommand(config.getString("commands.shield.success"), config.getString("commands.shield.description"), config.getString("commands.shield.usage"), config.getStringList("commands.shield.aliases"));
-
+        this.shieldCommand = new ShieldCommand(
+                config.getString("commands.shield.success"),
+                config.getString("commands.shield.description"),
+                config.getString("commands.shield.usage"),
+                config.getStringList("commands.shield.aliases")
+        );
 
         String shieldModuleCommand = config.getString("commands.shield_module.command");
 
-        if (shieldModuleCommand != null && !shieldModuleCommand.equalsIgnoreCase("null"))
-            this.registerCommandDynamically("qshield", shieldCommand);
+        if (shieldModuleCommand != null && !shieldModuleCommand.equalsIgnoreCase("null")) {
+            this.registerCommandDynamically(shieldModuleCommand, shieldCommand);
+        }
     }
 
-
-    private void registerCommandDynamically(String command, ShieldCommand commandInstance) {
+    private void registerCommandDynamically(String command, Command commandInstance) {
         try {
-            Object commandMapMethod = Bukkit.getServer().getClass().getMethod("getCommandMap").invoke(Bukkit.getServer());
-            commandMapMethod.getClass().getMethod("register", String.class, Command.class).invoke(commandMapMethod, command, commandInstance);
+            CommandMap commandMap = getCommandMap();
+            if (commandMap != null) {
+                commandMap.register(command, commandInstance);
+            } else {
+                throw new IllegalStateException("Could not retrieve the CommandMap");
+            }
         } catch (Exception e) {
-            System.out.println("Failed to register " + command);
+            LobbyShield.getInstance().getLogger().severe("Failed to register command: " + command);
             e.printStackTrace();
         }
     }
 
-    public ShieldCommand getShieldCommand() {
-        return this.shieldCommand;
+    private CommandMap getCommandMap() {
+        try {
+            Field commandMapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+            commandMapField.setAccessible(true);
+            return (CommandMap) commandMapField.get(Bukkit.getServer());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
+    public ShieldCommand getShieldCommand() {
+        return shieldCommand;
+    }
 }

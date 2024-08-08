@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 public class CommandUtils {
 
     public static boolean hasPermission(CommandSender sender, String permission ) {
-        Config config  = LobbyShield.getPlugin().getConfigManager().getCommandsConfig();
+        Config config  = LobbyShield.getInstance().getConfigManager().getCommandsConfig();
         return sender.hasPermission( config.getString( permission ) ) || sender.hasPermission( "qshield.*" );
     }
 
